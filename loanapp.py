@@ -10,13 +10,13 @@ CORS(app, resources={r"/login": {"origins": "http://localhost:3000"}})
 CORS(app, resources={r"/register": {"origins": "http://localhost:3000"}})
 CORS(app, resources={r"/predict": {"origins": "http://localhost:3000"}})
 CORS(app, resources={r"/logout": {"origins": "http://localhost:3000"}})
-app.secret_key = 'your_secret_key'  # Replace with a strong secret key
-
+CORS(app, resources={r"/getloanform": {"origins": "http://localhost:3000"}})
+app.secret_key = 'your_secret_key'  
 # Configure the MySQL database
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="",  # Replace with your MySQL password
+    password="",  
     database="loan"
 )
 
@@ -88,7 +88,7 @@ def customer_login():
 
         if customer:
             # Customer login successful
-            session['customer_id'] = customer['customer_id']  # Store customer_id in session
+            session['customer_id'] = customer['customer_id']  
             cursor.close()
             return jsonify({'message': 'Customer logged in successfully'}), 200  # Return 200 for success
         else:
@@ -98,13 +98,11 @@ def customer_login():
     except Exception as e:
         return jsonify({'error': str(e)}), 500  # Return 500 for internal server error
 
-# Modify the prediction function to handle encryption of categorical values and results
 @app.route('/predict', methods=['POST'])
 def predict_loan_eligibility():
     try:
         # Get data from the request
         data = request.json
-
         # Encrypt categorical values and store in a separate dictionary
         encrypted_categorical_values = {}
         for key, value in data.items():
@@ -121,7 +119,6 @@ def predict_loan_eligibility():
             else:
                 mapped_data[key] = str(value)  # Convert to string
 
-        # Make a prediction
         prediction = model.predict([list(mapped_data.values())])[0]
 
         # Convert the prediction to a human-readable result
@@ -152,7 +149,6 @@ def predict_loan_eligibility():
         return jsonify({'result': result})  # Return the unencrypted result to the frontend
 
     except Exception as e:
-        # Log the error for debugging purposes
         print("Prediction error:", str(e))
         return jsonify({'error': str(e)})
     

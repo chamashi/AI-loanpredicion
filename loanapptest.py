@@ -26,9 +26,9 @@ class TestLoanApp(unittest.TestCase):
     def test_customer_registration(self):
         # Define test data for customer registration
         test_data = {
-            'email': 'exo@example.com',
-            'name': 'exo user',
-            'password': 'exo123',
+            'email': 'test1@example.com',
+            'name': 'test user1',
+            'password': 'test12',
         }
 
         # Send a POST request to the registration endpoint
@@ -47,8 +47,8 @@ class TestLoanApp(unittest.TestCase):
     def test_customer_login(self):
         # Define test data for customer login
         test_data = {
-            'email': 'exo@example.com',
-            'password': 'exo123',
+            'email': 'test1@example.com',
+            'password': 'test12',
         }
 
         # Send a POST request to the login endpoint
@@ -64,9 +64,9 @@ class TestLoanApp(unittest.TestCase):
     def test_customer_registration_duplicate_email(self):
         # Define test data for duplicate email registration
         test_data = {
-            'email': 'exo@example.com',
-            'name': 'exo user',
-            'password': 'exo123',
+            'email': 'test1@example.com',
+            'name': 'test user1',
+            'password': 'test12',
         }
 
         # Send a POST request to the registration endpoint
@@ -78,6 +78,32 @@ class TestLoanApp(unittest.TestCase):
         # Parse the response JSON and check for the error message
         data = json.loads(response.data.decode('utf-8'))
         self.assertEqual(data['error'], 'Email is already registered')
+        
+    def test_predict_loan_eligibility(self):
+            
+        test_data = {
+            'Gender': 'Male',
+            'Married': 'No',
+            'Dependents': '0',
+            'Education': 'Graduate',
+            'Self_Employed': 'No',
+            'Credit_History': '1',
+            'Property_Area': 'Urban',
+            'ApplicantIncome': 18000,
+            'CoapplicantIncome': 0,
+            'LoanAmount': 100000,
+            'Loan_Amount_Term': 36
+        }
+
+        # Send a POST request to the predict endpoint
+        response = self.app.post('/predict', json=test_data)
+
+        # Check if the response status code is 200 (success)
+        self.assertEqual(response.status_code, 200)
+
+        # Parse the response JSON and check for the prediction result
+        data = json.loads(response.data.decode('utf-8'))
+        self.assertIn(data['result'], ['Approved', 'Rejected']) 
 
 if __name__ == '__main__':
     unittest.main()
